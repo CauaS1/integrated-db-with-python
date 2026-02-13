@@ -45,7 +45,14 @@ def table_exits ():
 table_exits()
 
 # Input that will give you options of what to do
-option = int(input('Choose what you will do: '))
+option = int(input("""
+    [1] - Create a new user
+    [2] - Read your user info
+    [3] - Update your username
+    [4] - Update your email
+                   
+    What you're going to do? Digit the number: 
+"""))
 
 def create_user ():
     name = input("your username: ")
@@ -72,10 +79,25 @@ def read_user():
 
     print(result)
 
+def update_username():
+    nameExisted = input("Type the name you want to change? ")
+    newName = input("Type your new name: ")
+    email = input("Confirm your email: ")
+
+    # Update function
+    cursor.execute(
+        "UPDATE users SET name = (%s) WHERE name = (%s) AND email = (%s)",
+        (newName, nameExisted, email)
+    )
+
+    connec.commit()
+
 match option:
     case 1:
         create_user()
     case 2:
         read_user()
+    case 3: 
+        update_username()
 
 
