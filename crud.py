@@ -33,7 +33,7 @@ def table_exits ():
 table_exits()
 
 
-""" def create_user ():
+def create_user ():
     name = input("your username: ")
     email = input("your email: ")
     password = input("your password: ")
@@ -62,5 +62,5 @@ match option:
         create_user()
     case 2:
         read_user()
-"""
+
 
