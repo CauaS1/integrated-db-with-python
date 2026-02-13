@@ -65,7 +65,7 @@ def read_user():
     lis = []
     lis.append(name)
     cursor.execute(
-        "SELECT * FROM users WHERE name = %s",
+        "SELECT name, email FROM users WHERE name = %s",
         lis
     )
     result = cursor.fetchall()
