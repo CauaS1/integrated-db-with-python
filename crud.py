@@ -3,13 +3,19 @@ import hashlib
 import os
 
 # Salt to protect the db from rainbow tables
-salt = os.urandom(16)
+saltValue = os.urandom(16)
 
 # Password hash
-def passwordHash(passw):    
-    encodedPassword = passw.encode()
+def passwordHash(passw, salt):    
+    print(salt)
+
+    if isinstance(passw, str):
+        password = passw.encode()
+    if isinstance(salt, str):
+        salt = bytes.fromhex(salt)
+        
     hs = hashlib.md5()
-    hs.update(salt + encodedPassword)
+    hs.update(salt + password)
     encryptePassword = hs.hexdigest()
 
     return encryptePassword
@@ -59,11 +65,11 @@ def create_user ():
     email = input("your email: ")
     password = input("your password: ")
 
-    storedPassword = passwordHash(password)
+    storedPassword = passwordHash(password, saltValue)
 
     cursor.execute(
         "INSERT INTO users (name, email, salt, password) VALUES (%s, %s, %s, %s)",
-        (name, email, salt.hex(), storedPassword)
+        (name, email, saltValue.hex(), storedPassword)
     )
     connec.commit()
 
@@ -75,9 +81,8 @@ def read_user():
         "SELECT name, email FROM users WHERE name = %s",
         lis
     )
-    result = cursor.fetchall()
-
-    print(result)
+    saltRe = cursor.fetchall()
+    print(saltRe)
 
 def update_username():
     nameExisted = input("Type the name you want to change? ")
@@ -92,6 +97,34 @@ def update_username():
 
     connec.commit()
 
+def update_email():
+    oldEmail = input("Type your email that you want to change: ")
+    newmEmail = input("Type your new email: ")
+    password = input("Confirm your email's password: ")
+
+    # Getting salt from the database
+    lis = []
+    lis.append(oldEmail)
+
+    cursor.execute(
+        "SELECT salt FROM users WHERE email = (%s)",
+        (lis)   
+    )
+
+    saltResult = cursor.fetchall()
+    saltResult = saltResult[0][0]
+
+    storedHashPassword = passwordHash(password, saltResult)
+    print(saltResult)
+    print(storedHashPassword)
+
+    cursor.execute(
+        "UPDATE users SET email = (%s) WHERE email = (%s) AND password = (%s)",
+        (newmEmail, oldEmail, storedHashPassword)
+    )
+
+    connec.commit()
+
 match option:
     case 1:
         create_user()
@@ -99,5 +132,7 @@ match option:
         read_user()
     case 3: 
         update_username()
+    case 4:
+        update_email()
 
 
