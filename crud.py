@@ -5,7 +5,35 @@ cursor = connec.cursor() #Tool that talks to the database
 
 option = int(input('Choose what you will do: '))
 
-def create_user ():
+
+def table_exits ():
+    cursor.execute(
+        "SELECT EXISTS (" 
+        "SELECT 1 FROM INFORMATION_SCHEMA.TABLES " 
+        "WHERE TABLE_SCHEMA = 'lab' and TABLE_NAME = 'users'" 
+        ") AS table_exists"
+    )
+
+    res = cursor.fetchall()
+    res = res[0][0] # 0 = dont exist | 1 = exits
+
+    if res == 0:
+        cursor.execute(
+            "CREATE TABLE users (" 
+                "id INT AUTO_INCREMENT PRIMARY KEY,"
+                "name VARCHAR(20),"
+                "email VARCHAR(50),"
+                "salt TEXT,"
+                "password TEXT"
+                
+            ")"
+        )
+        connec.commit()
+    
+table_exits()
+
+
+""" def create_user ():
     name = input("your username: ")
     email = input("your email: ")
     password = input("your password: ")
@@ -34,5 +62,5 @@ match option:
         create_user()
     case 2:
         read_user()
-
+"""
 
