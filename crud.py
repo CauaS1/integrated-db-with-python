@@ -1,11 +1,23 @@
 import mysql.connector
+import hashlib
+import os
+
+# Salt to protect the db from rainbow tables
+salt = os.urandom(16)
+
+# Password hash
+def passwordHash(passw):    
+    encodedPassword = passw.encode()
+    hs = hashlib.md5()
+    hs.update(salt + encodedPassword)
+    encryptePassword = hs.hexdigest()
+
+    return encryptePassword
 
 connec = mysql.connector.connect(user='root', password='1234567', database='lab')
 cursor = connec.cursor() #Tool that talks to the database
 
-option = int(input('Choose what you will do: '))
-
-
+# Checks if the table exists, if not, it will create one
 def table_exits ():
     cursor.execute(
         "SELECT EXISTS (" 
@@ -32,20 +44,23 @@ def table_exits ():
     
 table_exits()
 
+# Input that will give you options of what to do
+option = int(input('Choose what you will do: '))
 
 def create_user ():
     name = input("your username: ")
     email = input("your email: ")
     password = input("your password: ")
 
+    storedPassword = passwordHash(password)
+
     cursor.execute(
-        "INSERT INTO users (name, email, password) VALUES (%s, %s, %s)",
-        (name, email, password)
+        "INSERT INTO users (name, email, salt, password) VALUES (%s, %s, %s, %s)",
+        (name, email, salt.hex(), storedPassword)
     )
     connec.commit()
 
 def read_user():
-
     name = input("Your name, please: ")
     lis = []
     lis.append(name)
