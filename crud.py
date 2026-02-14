@@ -85,7 +85,7 @@ def read_user():
     print(saltRe)
 
 def update_username():
-    nameExisted = input("Type the name you want to change? ")
+    nameExisted = input("Type your current name you want to change? ")
     newName = input("Type your new name: ")
     email = input("Confirm your email: ")
 
@@ -98,9 +98,9 @@ def update_username():
     connec.commit()
 
 def update_email():
-    oldEmail = input("Type your email that you want to change: ")
+    oldEmail = input("Type your current email you want to change: ")
     newmEmail = input("Type your new email: ")
-    password = input("Confirm your email's password: ")
+    password = input("Confirm your current email's password: ")
 
     # Getting salt from the database
     lis = []
@@ -125,6 +125,34 @@ def update_email():
 
     connec.commit()
 
+def change_password():
+    email = input("Type your email: ")
+    passwd = input("Type your CURRENT password: ")
+    newPasswd = input("Type your NEW password: ")
+
+    lis = []
+    lis.append(email) # email inside a list
+
+    cursor.execute(
+        "SELECT password, salt FROM users WHERE email = (%s)",
+        (lis)
+    )
+
+    lis = cursor.fetchall()
+    print(lis)
+
+    storedOldHashPassword = passwordHash(passwd, lis[0][1])
+    
+    storedNewHashPassword = passwordHash(newPasswd, lis[0][1])
+
+    cursor.execute(
+        "UPDATE users SET password = (%s) WHERE email = (%s) AND password = (%s)",
+        (storedNewHashPassword, email, storedOldHashPassword)
+    )
+
+    connec.commit()
+
+
 match option:
     case 1:
         create_user()
@@ -134,5 +162,6 @@ match option:
         update_username()
     case 4:
         update_email()
-
-
+    case 5:
+        change_password()
+        
