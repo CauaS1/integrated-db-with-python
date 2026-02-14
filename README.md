@@ -12,3 +12,4 @@ It's a small project where I'm using `mysql.conector` on Python to create a CRUD
   * **A system that allow sthe user to checks their name and email inside the database**
       * Future upgrades will improve security measures to forbid you of getting another user's info with the same username as yours
   * **A system that allows you to change your email**
+      * you need to check and compare the hash password first to make any changes.
