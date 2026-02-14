@@ -56,6 +56,8 @@ option = int(input("""
     [2] - Read your user info
     [3] - Update your username
     [4] - Update your email
+    [5] - Update your password
+    [6] - Delete your account
                    
     What you're going to do? Digit the number: 
 """))
@@ -152,6 +154,29 @@ def change_password():
 
     connec.commit()
 
+def delete_account():
+    email = input("Type your emaiil: ")
+    password = input("Type your password: ")
+
+    lis = []
+    lis.append(email)
+    cursor.execute(
+        "SELECT password, salt FROM users WHERE email = (%s)",
+        (lis)
+    )
+
+    lis = cursor.fetchall()
+    print(lis)
+
+    storedOldHashPassword = passwordHash(password, lis[0][1])
+
+    cursor.execute(
+        "DELETE FROM users WHERE email = (%s) AND password = (%s)",
+        (email, storedOldHashPassword)
+    )
+
+    connec.commit()
+
 
 match option:
     case 1:
@@ -164,4 +189,6 @@ match option:
         update_email()
     case 5:
         change_password()
+    case 6:
+        delete_account()
         
